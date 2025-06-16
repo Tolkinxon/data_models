@@ -10,15 +10,16 @@ CREATE TABLE IF NOT EXISTS  customers(
     email VARCHAR(255) UNIQUE NOT NULL,
     phone_number VARCHAR(255) NOT NULL,
     is_admin BOOLEAN,
-    address VARCHAR(400) NOT NULL,
-    postcode VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(id)
 ); 
 
-INSERT INTO users(first_name, last_name,  password, email,  phone_number, is_admin, address, postcode ) VALUES
-("To'llqinxon", "Soliyev", "jifdHU%^4", "tolkinxon@gmail.com", "+998774779844", true, "Jomboy tuman/Samarqand MFY", "04070");
+INSERT INTO customers(first_name, last_name,  password, email,  phone_number, is_admin) VALUES
+("To'lqinxon", "Soliyev", "jifdHU%^4", "tolkinxon@gmail.com", "+998774779844", true),
+("Husan", "Qodirov", "fae4%^4", "husan@gmail.com", "+9987742844", false),
+("Mansur", "Bashirov", "njr4892%^4", "mansur@gmail.com", "+998777693484", false),
+("Sobir", "Mallayev", "539ngir%^4", "sobir@gmail.com", "+998777693483", false);
 
 CREATE TABLE IF NOT EXISTS categories(
     id INT AUTO_INCREMENT,
@@ -29,9 +30,12 @@ CREATE TABLE IF NOT EXISTS categories(
 );
 
 INSERT INTO categories(name) VALUES
-('Erkaklar kiyimi');
+('Piyozlilar'),
+('Tropik minatada unuvchi'),
+('Quruq mintaqada unuvchi'),
+('Tikonlilar');
 
-CREATE TABLE IF NOT EXISTS products(
+CREATE TABLE IF NOT EXISTS flowers(
     id INT AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
     price  DECIMAL(10,2) NOT NULL,
@@ -43,35 +47,51 @@ CREATE TABLE IF NOT EXISTS products(
     FOREIGN KEY(category_id) REFERENCES categories(id)
 );
 
-INSERT INTO products(name, price, category_id, product_img) VALUES
-("Palto", "1000000", 1, 'https://picsum.photos/200/300');
+INSERT INTO flowers(name, price, category_id, product_img) VALUES
+("Atirgul", "400000", 4, 'https://picsum.photos/200/300'),
+("Lola", "500000", 1, 'https://picsum.photos/200/300'),
+("Paportnik", "200000", 2, 'https://picsum.photos/200/300'),
+("Arhideya", "200000", 2, 'https://picsum.photos/200/300'),
+("Nilufar", "200000", 2, 'https://picsum.photos/200/300'),
+("Kaktus", "700000", 3, 'https://picsum.photos/200/300');
+
+CREATE TABLE IF NOT EXISTS addres(
+    id INT AUTO_INCREMENT,
+    customer_id INT,
+    city VARCHAR(255) NOT NULL,
+    region VARCHAR(255) NOT NULL,
+    street VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (city, region, street),
+    PRIMARY KEY(id),
+    FOREIGN KEY(customer_id) REFERENCES customers(id)
+);
+ 
+INSERT IGNORE INTO addres(customer_id, city, region, street) VALUES
+(1, "Samarqand", "Qo'shrabot", "Nurafshon"),
+(1, "Samarqand", "Qo'shrabot", "Nurafshon"),
+(2, "Toshkent", "Olmazor", "Nurafshon"),
+(3, "Sirdaryo", "Guliston", "Nurafshon"),
+(4, "Nukus", "Nukus", "Nurafshon");
 
 CREATE TABLE IF NOT EXISTS orders(
     id INT AUTO_INCREMENT,
-    product_id INT,
-    user_id INT,
+    flower_id INT,
+    customer_id INT,
+    address_id INT,
     amount INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY(id),
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(product_id) REFERENCES products(id)
+    FOREIGN KEY(flower_id) REFERENCES flowers(id),
+    FOREIGN KEY(customer_id) REFERENCES addres(customer_id),
+    FOREIGN KEY(address_id) REFERENCES addres(id)
 );
 
-INSERT INTO orders(product_id, user_id, amount) VALUES
-(1, 1, 3),
-(1, 1, 2);
+INSERT INTO orders(flower_id, customer_id, address_id, amount) VALUES
+(1, 1, 1, 4),
+(4, 2, 2, 5),
+(2, 3, 3, 2),
+(3, 4, 4, 1);
 
-CREATE TABLE IF NOT EXISTS purchased(
-    id INT AUTO_INCREMENT,
-    product_id INT,
-    user_id INT,
-    amount INT,
-    bought_date DATE,
-    PRIMARY KEY(id),
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(product_id) REFERENCES products(id)
-);
-INSERT INTO purchased(product_id, user_id, amount, bought_date) VALUES
-(1, 1, 3, CURRENT_DATE),
-(1, 1, 2, CURRENT_DATE);
